@@ -13,14 +13,16 @@ List<byte[]> ipRange = new List<byte[]>();
 
 for (int i = startRange[3]; i <= endRange[3]; i++)
 {
-	ipRange.Add(startRange);
+	byte[] currentIP = (byte[])startRange.Clone();
+	currentIP[3] = (byte)i;
+	ipRange.Add(currentIP);
 }
 
 foreach (byte[] ip in ipRange)
 {
 	string ipString = ParseByteToString(ip);
 	bool pinged = IsIPPingable(ipString);
-    Console.WriteLine($"{ipString}: {pinged}");
+    Console.WriteLine($"Reply from: {ipString} {(pinged ? "Answered" : "Didn't answer")}");
 }
 
 static byte[] ParseStringToByte(string x)
