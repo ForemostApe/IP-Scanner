@@ -10,6 +10,7 @@ byte[] startRange = IPAddress.Parse(startIP).GetAddressBytes();
 byte[] endRange = IPAddress.Parse(endIP).GetAddressBytes();
 
 List<byte[]> ipRange = new List<byte[]>();
+List<Task> pingTasks = new List<Task>();
 
 for (int i = startRange[3]; i <= endRange[3]; i++)
 {
@@ -21,14 +22,21 @@ for (int i = startRange[3]; i <= endRange[3]; i++)
 foreach (byte[] ip in ipRange)
 {
 	string ipString = new IPAddress(ip).ToString();
-	bool pinged = IsIPPingable(ipString);
+	pingTasks.Add(PingResponseAsync(ipString));
+}
+
+await Task.WhenAll(pingTasks);
+
+static async Task PingResponseAsync(string ipString)
+{
+	bool pinged = await IsIPPingableAsync(ipString);
 	Console.WriteLine($"Reply from: {ipString} {(pinged ? "Answered" : "Didn't answer")}");
 }
 
-static bool IsIPPingable(string z)
+static async Task<bool> IsIPPingableAsync(string ip)
 {
 	using Ping pingSender = new Ping();
-	PingReply reply = pingSender.Send(z);
+	PingReply reply = await pingSender.SendPingAsync(ip);
 	return reply.Status == IPStatus.Success;
 }
 
