@@ -6,8 +6,8 @@ string startIP= Console.ReadLine();
 Console.Write("Ange slut-IP för scan: ");
 string endIP = Console.ReadLine();
 
-byte[] startRange = ParseStringToByte(startIP);
-byte[] endRange = ParseStringToByte(endIP);
+byte[] startRange = IPAddress.Parse(startIP).GetAddressBytes();
+byte[] endRange = IPAddress.Parse(endIP).GetAddressBytes();
 
 List<byte[]> ipRange = new List<byte[]>();
 
@@ -20,21 +20,9 @@ for (int i = startRange[3]; i <= endRange[3]; i++)
 
 foreach (byte[] ip in ipRange)
 {
-	string ipString = ParseByteToString(ip);
+	string ipString = new IPAddress(ip).ToString();
 	bool pinged = IsIPPingable(ipString);
-    Console.WriteLine($"Reply from: {ipString} {(pinged ? "Answered" : "Didn't answer")}");
-}
-
-static byte[] ParseStringToByte(string x)
-{
-	byte[] ipAddressByte = IPAddress.Parse(x).GetAddressBytes();
-	return ipAddressByte;
-}
-
-static string ParseByteToString(byte[] y)
-{
-	string ipAddressString = new IPAddress(y).ToString();
-	return ipAddressString;
+	Console.WriteLine($"Reply from: {ipString} {(pinged ? "Answered" : "Didn't answer")}");
 }
 
 static bool IsIPPingable(string z)
