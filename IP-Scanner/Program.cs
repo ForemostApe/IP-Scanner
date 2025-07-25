@@ -1,14 +1,29 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
 
-Console.Write("Ange start-IP för scan: ");
-string startIP= Console.ReadLine();
-Console.Write("Ange slut-IP för scan: ");
-string endIP = Console.ReadLine();
+IPAddress startOfIpRange, endOfIpRange;
+
+while (true)
+{
+	Console.Write("Ange start-IP för scan: ");
+	string? input = Console.ReadLine();
+	if (input != null && IPAddress.TryParse(input, out startOfIpRange))
+		break;
+	Console.WriteLine("Ange en korrekt IP-address.");
+}
+
+while (true)
+{
+    Console.Write("Ange slut-IP för scan: ");
+    string? input = Console.ReadLine();
+    if (input != null && IPAddress.TryParse(input, out endOfIpRange))
+        break;
+    Console.WriteLine("Ange en korrekt IP-address.");
+}
 
 //Converts the IP from string-format to a byte array, required to create the full range to check.
-byte[] startRange = IPAddress.Parse(startIP).GetAddressBytes();
-byte[] endRange = IPAddress.Parse(endIP).GetAddressBytes();
+byte[] startRange = startOfIpRange.GetAddressBytes();
+byte[] endRange = endOfIpRange.GetAddressBytes();
 
 List<byte[]> ipRange = new List<byte[]>();
 List<Task> pingTasks = new List<Task>();
@@ -43,7 +58,7 @@ static async Task PingResponseAsync(string ipString)
 static async Task<bool> IsIPPingableAsync(string ip)
 {
 	using Ping pingSender = new Ping();
-	PingReply reply = await pingSender.SendPingAsync(ip);
+	PingReply reply = await pingSender.SendPingAsync(ip, 5000);
 	return reply.Status == IPStatus.Success;
 }
 
